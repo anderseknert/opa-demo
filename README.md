@@ -1,6 +1,10 @@
 
 
-# Running 
+# OPA Demo
+
+## Microservice authorization
+
+### Running
 
 ```shell
 token=$(jwt encode --secret supersecret --sub anders '{"roles": ["developer"], "aud": "opa-demo"}')
