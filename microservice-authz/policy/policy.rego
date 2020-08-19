@@ -25,7 +25,7 @@ deny[reason] {
 
 decision = {
     "allow": count(deny) == 0,
-    "reason": concat(", ", deny)
+    "message": concat(", ", deny)
 }
 
 in(coll, item) {
