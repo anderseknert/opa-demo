@@ -1,34 +1,61 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: opa-demo-orc
+  name: opa-demo-api
   labels:
-    app: opa-demo-orc
+    app: opa-demo-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: opa-demo-orc
+      app: opa-demo-api
   template:
     metadata:
       labels:
-        app: nginx
+        app: opa-demo-api
     spec:
-      securityContext:
-        allowPrivilegeEscalation: false
-        runAsNonRoot: true
-        runAsUser: 12345
-        runAsGroup: 12345
-        readOnlyRootFilesystem: true
-        capabilities:
-          drop:
-          - all
       containers:
-        - name: nginx
-          image: nginx:1.14.2
+        - name: opa-demo-api
+          image: eknert/opa-demo-app:test
           ports:
             - containerPort: 8080
         - name: opa
-          image: openpolicyagent/opa:0.23.0-rootless
+          image: openpolicyagent/opa:0.23.1-rootless
           ports:
             - containerPort: 8181
+          args:
+          - "run"
+          - "--ignore=.*"
+          - "--server"
+          - "/policies"
+          volumeMounts:
+          - readOnly: true
+            mountPath: /policies
+            name: opa-demo-policy
+      volumes:
+        - name: opa-demo-policy
+          configMap:
+            name: opa-demo-policy
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: opa-demo-api
+spec:
+  selector:
+    app: opa-demo-api
+  ports:
+  - port: 8080
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: opa-demo-api-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /opa-demo-api
+        backend:
+          serviceName: opa-demo-api
+          servicePort: 8080
