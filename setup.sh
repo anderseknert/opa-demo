@@ -10,6 +10,11 @@ kind create cluster --name opa-demo --config kind-config.yaml
 k apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 
 # Install microservices
+
+opa build microservice-authz/policy/
+aws s3 cp bundle.tar.gz s3://opa-demo/
+rm bundle.tar.gz
+
 cd microservice-authz
 #docker build -t eknert/opa-demo-app:test .
 kind load docker-image eknert/opa-demo-app:test --name opa-demo
