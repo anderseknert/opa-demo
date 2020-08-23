@@ -1,0 +1,12 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: opa-demo-api-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /opa-demo-api
+        backend:
+          serviceName: opa-demo-api
+          servicePort: 8080

@@ -16,7 +16,7 @@ logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 app = Flask(__name__)
 
 opa_url = os.environ.get('OPA_ADDR', 'http://localhost:8181')
-policy_path = os.environ.get('POLICY_PATH', '/v1/data/authz')
+policy_path = os.environ.get('POLICY_PATH', '/v1/data/authz/decision')
 
 def check_auth(url, method, url_as_array, token):
     input_dict = {
@@ -36,20 +36,20 @@ def check_auth(url, method, url_as_array, token):
         return {}
     j = rsp.json()
     if rsp.status_code >= 300:
-        logging.info("Error checking auth, got status %s and message: %s" % (j.status_code, j.text))
+        logging.info("Error checking auth, got status %s and message: %s\n" % (j.status_code, j.text))
         return {}
     logging.info('Auth response:')
     logging.info(json.dumps(j, indent=2))
     return j
 
-@app.route('/', defaults={'path': ''})
+@app.route('/opa-demo-api', defaults={'path': ''})
 @app.route('/<path:path>')
 def root(path):
     auth_header = request.headers.get('Authorization')
     if auth_header:
         token = auth_header.split('Bearer ')[1]
     else:
-        return "Error: no Authorization header present in %s request to %s" % (request.method, path), 401
+        return "Error: no Authorization header present in %s request to %s\n" % (request.method, path), 401
 
     url = opa_url + policy_path
     path_as_array = path.split('/')
@@ -57,7 +57,7 @@ def root(path):
     j = check_auth(url, request.method, path_as_array, token).get('result', {})
     if j.get("allow", False):
         return "Success: user is authorized\n"
-    return "Error: user not authorized to %s url /%s \n" % (request.method, path), 401
+    return "Authorization failed with message %s\n" % j["message"], 401
 
 if __name__ == "__main__":
-    app.run(port=8080)
+    app.run(host='0.0.0.0', port=8080)

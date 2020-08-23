@@ -11,6 +11,7 @@ spec:
       app: opa-demo-api
   template:
     metadata:
+      name: opa-demo-api
       labels:
         app: opa-demo-api
     spec:
@@ -23,19 +24,29 @@ spec:
           image: openpolicyagent/opa:0.23.1-rootless
           ports:
             - containerPort: 8181
+          env:
+            - name: JWT_REQUIRED_ROLES
+              value: "api-reader"
           args:
-          - "run"
-          - "--ignore=.*"
-          - "--server"
-          - "/policies"
-          volumeMounts:
-          - readOnly: true
-            mountPath: /policies
-            name: opa-demo-policy
-      volumes:
-        - name: opa-demo-policy
-          configMap:
-            name: opa-demo-policy
+            - 'run'
+            - '--ignore=.*'
+            - '--server'
+            - '--set=services.s3.url=http://opa-demo.s3.eu-north-1.amazonaws.com'
+            - '--set=bundles.bundle.service=s3'
+            - '--set=bundles.bundle.resource=bundle.tar.gz'
+          livenessProbe:
+            httpGet:
+              scheme: HTTP
+              port: 8181
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health?bundle=true
+              scheme: HTTP
+              port: 8181
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ---
 kind: Service
 apiVersion: v1
@@ -46,16 +57,4 @@ spec:
     app: opa-demo-api
   ports:
   - port: 8080
----
-kind: Ingress
-apiVersion: extensions/v1beta1
-metadata:
-  name: opa-demo-api-ingress
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /opa-demo-api
-        backend:
-          serviceName: opa-demo-api
-          servicePort: 8080
+    targetPort: 8080
