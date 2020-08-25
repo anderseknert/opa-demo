@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- resources/opa-demo-api.yaml
+- resources/opa-demo-orc.yaml
+- resources/opa-demo-svc.yaml
+- resources/ingress.yaml
+
+namespace: default
+
+patchesJson6902:
+- path: resources/opa-sidecar.json
+  target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: opa-demo-api
+- path: resources/opa-sidecar.json
+  target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: opa-demo-orc
+- path: resources/opa-sidecar.json
+  target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: opa-demo-svc

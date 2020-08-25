@@ -7,11 +7,16 @@ decoded := io.jwt.decode_verify(input.token, {
 })
 claims := decoded[2]
 
-required_roles := to_set(split(opa.runtime().env.JWT_REQUIRED_ROLES, " "))
+tier := opa.runtime().env.TIER
 
-deny[reason] {
-    not required_roles
-    reason = "At least one role needs to be provided from env var JWT_REQUIRED_ROLES"
+required_roles_in_tier := {
+    "api": {"api-reader"},
+    "orc": {"orc-reader"},
+    "svc": {"svc-reader"},
+}
+
+is_admin {
+    claims.roles[_] == "admin"
 }
 
 deny[reason] {
@@ -26,7 +31,19 @@ deny[reason] {
 }
 
 deny[reason] {
-    result := required_roles - to_set(claims.roles)
+    not tier
+    reason := "Environment variable TIER not set"
+}
+
+deny[reason] {
+    valid_tiers = {"api", "orc", "svc"}
+    not valid_tiers[tier]
+    reason = sprintf("Tier %v not in list of valid tiers %v", [tier, valid_tiers])
+}
+
+deny[reason] {
+    not is_admin
+    result := required_roles_in_tier[tier] - to_set(claims.roles)
     count(result) > 0
     reason = sprintf("Missing required roles %v in token claims %v", [result, claims.roles])
 }

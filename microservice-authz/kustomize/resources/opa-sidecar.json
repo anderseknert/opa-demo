@@ -1,0 +1,50 @@
+[
+  {
+    "op": "add", 
+    "path": "/spec/template/spec/containers/-", 
+    "value": {
+      "args": [
+        "run",
+        "--ignore=.*",
+        "--server",
+        "--set=services.s3.url=http://opa-demo.s3.eu-north-1.amazonaws.com",
+        "--set=bundles.bundle.service=s3",
+        "--set=bundles.bundle.resource=bundle.tar.gz"
+      ],
+      "env": [
+        {
+          "name": "TIER",
+          "valueFrom": {
+            "fieldRef": {
+              "fieldPath": "metadata.labels['tier']"
+            }
+          }
+        }
+      ],
+      "image": "openpolicyagent/opa:0.23.1-rootless",
+      "livenessProbe": {
+        "httpGet": {
+          "port": 8181,
+          "scheme": "HTTP"
+        },
+        "initialDelaySeconds": 5,
+        "periodSeconds": 5
+      },
+      "name": "opa",
+      "ports": [
+        {
+          "containerPort": 8181
+        }
+      ],
+      "readinessProbe": {
+        "httpGet": {
+          "path": "/health?bundle=true",
+          "port": 8181,
+          "scheme": "HTTP"
+        },
+        "initialDelaySeconds": 5,
+        "periodSeconds": 5
+      }
+    }
+  }
+]

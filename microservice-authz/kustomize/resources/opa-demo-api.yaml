@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa-demo-api
+  labels:
+    app: opa-demo
+    service: opa-demo-api
+    tier: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: opa-demo-api
+  template:
+    metadata:
+      name: opa-demo-api
+      labels:
+        app: opa-demo
+        service: opa-demo-api
+        tier: api
+    spec:
+      containers:
+        - name: opa-demo-api
+          image: eknert/opa-demo-app:test
+          ports:
+            - containerPort: 8080
+          env:
+            - name: TIER
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tier']
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: opa-demo-api
+spec:
+  selector:
+    service: opa-demo-api
+  ports:
+  - port: 8080
+    targetPort: 8080

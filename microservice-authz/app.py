@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 opa_url = os.environ.get('OPA_ADDR', 'http://localhost:8181')
 policy_path = os.environ.get('POLICY_PATH', '/v1/data/authz/decision')
+tier = os.environ.get('TIER')
 
 def check_auth(url, method, url_as_array, token):
     input_dict = {
@@ -29,6 +30,7 @@ def check_auth(url, method, url_as_array, token):
 
     logging.info('Authorizing...')
     logging.info(json.dumps(input_dict, indent=2))
+    
     try:
         rsp = requests.post(url, data=json.dumps(input_dict))
     except Exception as err:
@@ -42,6 +44,19 @@ def check_auth(url, method, url_as_array, token):
     logging.info(json.dumps(j, indent=2))
     return j
 
+def forward_request(token):
+    next_tier = {'api': 'orc', 'orc': 'svc'}[tier]
+    url = f'http://opa-demo-{next_tier}.default.svc.cluster.local:8080/opa-demo-{next_tier}'
+    
+    try:
+        rsp = requests.get(url, headers = {'authorization': f'Bearer {token}'})
+    except Exception as err:
+        logging.info(err)
+        return f'Error forwarding request to tier {next_tier}, error: {err}'
+
+    return f'User authorized in {tier} tier' + "\n" + rsp.text 
+
+
 @app.route('/opa-demo-api', defaults={'path': ''})
 @app.route('/<path:path>')
 def root(path):
@@ -49,15 +64,22 @@ def root(path):
     if auth_header:
         token = auth_header.split('Bearer ')[1]
     else:
-        return "Error: no Authorization header present in %s request to %s\n" % (request.method, path), 401
+        return f'Error: no Authorization header present in {request.method} request to {path}\n', 401
 
     url = opa_url + policy_path
     path_as_array = path.split('/')
 
     j = check_auth(url, request.method, path_as_array, token).get('result', {})
     if j.get("allow", False):
-        return "Success: user is authorized\n"
-    return "Authorization failed with message %s\n" % j["message"], 401
+        if tier == 'svc':
+            return f'User authorized in {tier} tier\n'
+        else:
+            return forward_request(token)
+    
+    message = f'Authorization failure in {tier} tier: {j["message"]}\n'
+    logging.warn(message)
+
+    return message, 401
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8080)
