@@ -1,0 +1,27 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.2.0
+  hooks:
+  - id: check-json
+  - id: check-yaml
+    args:
+    - '--allow-multiple-documents'
+  - id: check-merge-conflict
+  - id: check-executables-have-shebangs
+  - id: check-byte-order-marker
+  - id: check-added-large-files
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+
+- repo: https://github.com/anderseknert/pre-commit-opa
+  rev: v1.2.1
+  hooks:
+  - id: opa-fmt
+    files: (\.rego)$
+  - id: opa-check
+  - id: opa-test
+    args: ['-v']
+    files: '(microservice-authz/policy/|policy-example/).*$'
+  - id: conftest-test
+    args: ['--policy', 'conftest/policy']
+    files: conftest/.*\.yaml$
