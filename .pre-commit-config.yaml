@@ -21,8 +21,7 @@ repos:
   - id: opa-check
   - id: opa-fmt
   - id: opa-test
-    args: ['-v']
-    files: '(microservice-authz/policy/|policy-example/).*$'
+    args: ['policy-example/', 'microservice-authz/policy/']
   - id: conftest-test
     args: ['--policy', 'conftest/policy']
     files: conftest/.*\.yaml$
