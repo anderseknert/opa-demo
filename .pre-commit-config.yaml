@@ -17,7 +17,6 @@ repos:
   rev: v1.2.1
   hooks:
   - id: opa-fmt
-    files: (\.rego)$
   - id: opa-check
   - id: opa-test
     args: ['-v']
