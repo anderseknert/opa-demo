@@ -1,7 +1,7 @@
 [
   {
-    "op": "add", 
-    "path": "/spec/template/spec/containers/-", 
+    "op": "add",
+    "path": "/spec/template/spec/containers/-",
     "value": {
       "args": [
         "run",

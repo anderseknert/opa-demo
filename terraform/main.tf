@@ -14,6 +14,3 @@ resource "aws_s3_bucket" "opa_demo_bucket" {
   policy        = file("policy.json")
   force_destroy = true
 }
-
-
-

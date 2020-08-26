@@ -30,7 +30,7 @@ def check_auth(url, method, url_as_array, token):
 
     logging.info('Authorizing...')
     logging.info(json.dumps(input_dict, indent=2))
-    
+
     try:
         rsp = requests.post(url, data=json.dumps(input_dict))
     except Exception as err:
@@ -47,14 +47,14 @@ def check_auth(url, method, url_as_array, token):
 def forward_request(token):
     next_tier = {'api': 'orc', 'orc': 'svc'}[tier]
     url = f'http://opa-demo-{next_tier}.default.svc.cluster.local:8080/opa-demo-{next_tier}'
-    
+
     try:
         rsp = requests.get(url, headers = {'authorization': f'Bearer {token}'})
     except Exception as err:
         logging.info(err)
         return f'Error forwarding request to tier {next_tier}, error: {err}'
 
-    return f'User authorized in {tier} tier' + "\n" + rsp.text 
+    return f'User authorized in {tier} tier' + "\n" + rsp.text
 
 
 @app.route('/opa-demo-api', defaults={'path': ''})
@@ -75,7 +75,7 @@ def root(path):
             return f'User authorized in {tier} tier\n'
         else:
             return forward_request(token)
-    
+
     message = f'Authorization failure in {tier} tier: {j["message"]}\n'
     logging.warn(message)
 
