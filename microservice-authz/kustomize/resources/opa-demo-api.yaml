@@ -20,7 +20,7 @@ spec:
         tier: api
     spec:
       containers:
-        - name: opa-demo-api
+        - name: opa-demo
           image: eknert/opa-demo-app:test
           ports:
             - containerPort: 8080

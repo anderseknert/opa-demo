@@ -16,9 +16,9 @@ required_roles_in_tier := {
 	"svc": {"svc-reader"},
 }
 
-is_admin {
-	claims.roles[_] == "admin"
-}
+# is_admin {
+# 	claims.roles[_] == "admin"
+# }
 
 deny[reason] {
 	not input.token
@@ -37,13 +37,18 @@ deny[reason] {
 }
 
 deny[reason] {
+	input.method != "GET"
+	reason := "Only GET requests allowed"
+}
+
+deny[reason] {
 	valid_tiers = {"api", "orc", "svc"}
 	not valid_tiers[tier]
 	reason = sprintf("Tier %v not in list of valid tiers %v", [tier, valid_tiers])
 }
 
 deny[reason] {
-	not is_admin
+	#not is_admin
 	result := required_roles_in_tier[tier] - to_set(claims.roles)
 	count(result) > 0
 	reason = sprintf("Missing required roles %v in token claims %v", [result, claims.roles])

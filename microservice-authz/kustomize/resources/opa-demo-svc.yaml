@@ -20,7 +20,7 @@ spec:
         tier: svc
     spec:
       containers:
-        - name: opa-demo-svc
+        - name: opa-demo
           image: eknert/opa-demo-app:test
           ports:
             - containerPort: 8080

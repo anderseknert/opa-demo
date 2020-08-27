@@ -20,7 +20,7 @@ spec:
         tier: orc
     spec:
       containers:
-        - name: opa-demo-orc
+        - name: opa-demo
           image: eknert/opa-demo-app:test
           ports:
             - containerPort: 8080

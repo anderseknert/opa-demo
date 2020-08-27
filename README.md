@@ -23,3 +23,10 @@ curl -H "Authorization: Bearer ${token}" http://localhost/opa-demo-api
 ```
 
 The response returned should report authorization status for each tier reached.
+
+### Demo
+
+1. Review the kubernetes resource definitions and sidecar patch
+2. Review the policy
+3. Review the python app code
+4. If time allows - policy change

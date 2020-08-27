@@ -10,19 +10,19 @@ resources:
 namespace: default
 
 patchesJson6902:
-- path: resources/opa-sidecar.json
+- path: patches/opa-sidecar.json
   target:
     group: apps
     version: v1
     kind: Deployment
     name: opa-demo-api
-- path: resources/opa-sidecar.json
+- path: patches/opa-sidecar.json
   target:
     group: apps
     version: v1
     kind: Deployment
     name: opa-demo-orc
-- path: resources/opa-sidecar.json
+- path: patches/opa-sidecar.json
   target:
     group: apps
     version: v1

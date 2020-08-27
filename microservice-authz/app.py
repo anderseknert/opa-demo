@@ -19,10 +19,9 @@ opa_url = os.environ.get('OPA_ADDR', 'http://localhost:8181')
 policy_path = os.environ.get('POLICY_PATH', '/v1/data/authz/decision')
 tier = os.environ.get('TIER')
 
-def check_auth(url, method, url_as_array, token):
+def check_auth(url, method, token):
     input_dict = {
         'input': {
-            'path': url_as_array,
             'method': method,
             'token': token
         }
@@ -38,7 +37,7 @@ def check_auth(url, method, url_as_array, token):
         return {}
     j = rsp.json()
     if rsp.status_code >= 300:
-        logging.info("Error checking auth, got status %s and message: %s\n" % (j.status_code, j.text))
+        logging.info("Error checking auth, got status %s and message: %s", j.status_code, j.text)
         return {}
     logging.info('Auth response:')
     logging.info(json.dumps(j, indent=2))
@@ -49,7 +48,7 @@ def forward_request(token):
     url = f'http://opa-demo-{next_tier}.default.svc.cluster.local:8080/opa-demo-{next_tier}'
 
     try:
-        rsp = requests.get(url, headers = {'authorization': f'Bearer {token}'})
+        rsp = requests.get(url, headers={'authorization': f'Bearer {token}'})
     except Exception as err:
         logging.info(err)
         return f'Error forwarding request to tier {next_tier}, error: {err}'
@@ -64,22 +63,22 @@ def root(path):
     if auth_header:
         token = auth_header.split('Bearer ')[1]
     else:
-        return f'Error: no Authorization header present in {request.method} request to {path}\n', 401
+        message = f'Error: no Authorization header present in {request.method} request to {path}\n'
+        return message, 401
 
     url = opa_url + policy_path
-    path_as_array = path.split('/')
 
-    j = check_auth(url, request.method, path_as_array, token).get('result', {})
-    if j.get("allow", False):
+    j = check_auth(url, request.method, token).get('result', {})
+    if j.get('allow', False):
         if tier == 'svc':
             return f'User authorized in {tier} tier\n'
         else:
             return forward_request(token)
 
     message = f'Authorization failure in {tier} tier: {j["message"]}\n'
-    logging.warn(message)
+    logging.warning(message)
 
     return message, 401
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
