@@ -1,5 +1,7 @@
 package main
 
+# Simple example of conftest verifying assertions of provided config
+
 deny[reason] {
 	input.kind != "Secret"
 	reason = "Expected resource to be of kind Secret"
