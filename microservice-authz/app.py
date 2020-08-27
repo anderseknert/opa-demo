@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 
-# Based on https://github.com/open-policy-agent/contrib/tree/master/api_authz
+'''
+Simple microservice that checks the Authorization header of incoming requests, sends it to OPA for
+verification and a policy decision. If the decision is a deny, stops the request and returns a 401.
+If the decision is allow, pass the request to the next service downwards in the tiers, following:
 
-import base64
+api
+   \-> orc
+          \-> svc
+
+The code for each service running in these tiers is identical (this one), but the policy may still
+differ as both the app and the associated OPA instance is made aware of the tier in which it is
+running.
+
+Based on https://github.com/open-policy-agent/contrib/tree/master/api_authz
+'''
+
 import json
 import logging
 import os
@@ -37,7 +50,7 @@ def check_auth(url, method, token):
         return {}
     j = rsp.json()
     if rsp.status_code >= 300:
-        logging.info("Error checking auth, got status %s and message: %s", j.status_code, j.text)
+        logging.info("Error checking auth, got status %s and message: %s", rsp.status_code, j.text)
         return {}
     logging.info('Auth response:')
     logging.info(json.dumps(j, indent=2))
@@ -72,8 +85,7 @@ def root(path):
     if j.get('allow', False):
         if tier == 'svc':
             return f'User authorized in {tier} tier\n'
-        else:
-            return forward_request(token)
+        return forward_request(token)
 
     message = f'Authorization failure in {tier} tier: {j["message"]}\n'
     logging.warning(message)

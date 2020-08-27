@@ -26,7 +26,8 @@ The response returned should report authorization status for each tier reached.
 
 ### Demo
 
-1. Review the kubernetes resource definitions and sidecar patch
-2. Review the policy
-3. Review the python app code
-4. If time allows - policy change
+1. Review setup.sh
+2. Review the kubernetes resource definitions and sidecar patch
+3. Review the policy
+4. Review the python app code
+5. If time allows - policy change
