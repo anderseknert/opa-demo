@@ -1,0 +1,30 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredreplicas
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredReplicas
+        listKind: K8sRequiredReplicasList
+        plural: k8srequiredreplicas
+        singular: k8srequiredreplicas
+      validation:
+        openAPIV3Schema:
+          properties:
+            replicas:
+              type: integer
+  targets:
+  - target: admission.k8s.gatekeeper.sh
+    rego: |
+      package k8srequiredreplicas
+
+      violation[{"msg": msg}] {
+        input.review.object.spec.replicas < input.parameters.replicas
+
+        msg := sprintf("Minumum number of replicas = %v, provided = %v", [
+            input.review.object.spec.replicas,
+            input.parameters.replicas,
+        ])
+      }
