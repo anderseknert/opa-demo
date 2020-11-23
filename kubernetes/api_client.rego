@@ -15,23 +15,19 @@ resource_group_mapping := {
 	"networkpolicies": "apis/networking.k8s.io/v1",
 }
 
-# TODO
-# - caching
-# - alternative way of getting token
-# - error handling - fail open if desired
-query(resource, name, namespace) = response_body {
-	token := opa.runtime().env.KUBERNETES_API_TOKEN
-	response = http.send({
-		"url": resource_url(resource, name, namespace),
-		"method": "get",
-		"headers": {"authorization": sprintf("Bearer %v", [token])},
-		"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
-	})
+# TODO: non-namespaced query
+ns_query(resource, name, namespace) = http.send({
+	"url": sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v/%v", [
+		resource_group_mapping[resource],
+		namespace,
+		resource,
+		name,
+	]),
+	"method": "get",
+	"headers": {"authorization": sprintf("Bearer %v", [api_token])},
+	"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+	"raise_error": false,
+})
 
-	response_body := response.body
-}
-
-resource_url(resource, name, namespace) = url {
-	group := resource_group_mapping[resource]
-	url := sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v/%v", [group, namespace, resource, name])
-}
+# TODO: alternative way of getting token?
+api_token = opa.runtime().env.KUBERNETES_API_TOKEN
