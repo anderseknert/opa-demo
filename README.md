@@ -31,3 +31,15 @@ The response returned should report authorization status for each tier reached.
 3. Review the policy
 4. Review the python app code
 5. If time allows - policy change
+
+## Identity
+
+OAuth and OpenID Connect policies and helpers.
+
+## Kubernetes
+
+Various policies and functions to help work with kubernetes.
+
+## RBAC
+
+RBAC implementation in Rego.
