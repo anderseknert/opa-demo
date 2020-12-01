@@ -1,5 +1,9 @@
 resources:
-- resources/resources.yaml
+- resources/deployment.yaml
+- resources/ingress.yaml
+- resources/rbac.yaml
+- resources/secret.yaml
+- resources/service.yaml
 configMapGenerator:
 - name: opa-kubernetes-client
   files:
