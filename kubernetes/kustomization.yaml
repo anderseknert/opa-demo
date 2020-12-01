@@ -1,0 +1,8 @@
+resources:
+- resources/resources.yaml
+configMapGenerator:
+- name: opa-kubernetes-client
+  files:
+  - policy/api_client.rego
+generatorOptions:
+  disableNameSuffixHash: true

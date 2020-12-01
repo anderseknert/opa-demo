@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa-kubernetes-client
+  labels:
+    app: opa-kubernetes-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opa-kubernetes-client
+  template:
+    metadata:
+      name: opa-kubernetes-client
+      labels:
+        app: opa-kubernetes-client
+    spec:
+      containers:
+        - name: opa
+          image: openpolicyagent/opa:edge-debug
+          args: [
+            "run",
+            "--server",
+            "--ignore=.*",
+            "--addr=:8181",
+            "--log-level=info",
+            "/policy"
+          ]
+          ports:
+            - containerPort: 8181
+          env:
+            - name: KUBERNETES_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opa-kubernetes-client
+                  key: token
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8181
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8181
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          volumeMounts:
+          - name: policy
+            mountPath: /policy
+      volumes:
+        - name: policy
+          configMap:
+            name: opa-kubernetes-client
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: opa-kubernetes-client
+spec:
+  selector:
+    app: opa-kubernetes-client
+  ports:
+  - port: 8181
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opa-kubernetes-client
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: opa-kubernetes-client
+            port:
+              number: 8181
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opa-kubernetes-client
+  annotations:
+    kubernetes.io/service-account.name: default
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: default-read
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: opa-kubernetes-client
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: opa-kubernetes-client
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - pods
+  - configmaps
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - statefulsets
+  - replicasets
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - autoscaling
+  resources:
+  - horizontalpodautoscalers
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - networkpolicies
+  verbs:
+  - get
+  - list

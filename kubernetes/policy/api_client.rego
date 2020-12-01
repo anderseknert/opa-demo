@@ -17,8 +17,8 @@ resource_group_mapping := {
 	"networkpolicies": "apis/networking.k8s.io/v1",
 }
 
-# TODO: non-namespaced query
-ns_query(resource, name, namespace) = http.send({
+# Query for given resource/name in provided namespace
+query_ns(resource, name, namespace) = http.send({
 	"url": sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v/%v", [
 		resource_group_mapping[resource],
 		namespace,
@@ -26,10 +26,24 @@ ns_query(resource, name, namespace) = http.send({
 		name,
 	]),
 	"method": "get",
-	"headers": {"authorization": sprintf("Bearer %v", [api_token])},
+	"headers": {"authorization": sprintf("Bearer %v", [opa.runtime().env.KUBERNETES_API_TOKEN])},
 	"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
 	"raise_error": false,
 })
 
-# TODO: alternative way of getting token?
-api_token = opa.runtime().env.KUBERNETES_API_TOKEN
+# Query for all resources of type resource in all namespaces
+query_all(resource) = http.send({
+	"url": sprintf("https://kubernetes.default.svc/%v/%v", [
+		resource_group_mapping[resource],
+		resource,
+	]),
+	"method": "get",
+	"headers": {"authorization": sprintf("Bearer %v", [opa.runtime().env.KUBERNETES_API_TOKEN])},
+	"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+	"raise_error": false,
+})
+
+q := query_all("pods")
+
+#query_label_selector()
+#?labelSelector=environment%3Dproduction,tier%3Dfrontend
