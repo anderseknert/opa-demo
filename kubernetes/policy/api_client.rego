@@ -1,5 +1,8 @@
 package kubernetes.api_client
 
+# This information could be retrieved from the kubernetes API
+# too, but would essentially require a request per API group,
+# so for now use a lookup table for the most common resources.
 resource_group_mapping := {
 	"services": "api/v1",
 	"pods": "api/v1",
@@ -18,7 +21,8 @@ resource_group_mapping := {
 }
 
 # Query for given resource/name in provided namespace
-query_ns(resource, name, namespace) = http.send({
+# Example: query_ns("deployments", "my-app", "default")
+query_name_ns(resource, name, namespace) = http.send({
 	"url": sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v/%v", [
 		resource_group_mapping[resource],
 		namespace,
@@ -31,7 +35,24 @@ query_ns(resource, name, namespace) = http.send({
 	"raise_error": false,
 })
 
+# Query for given resource type using label selector query string syntax
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api
+# Example: query_label_selector_ns("deployments", "app%3Dopa-kubernetes-client", "default")
+query_label_selector_ns(resource, selector, namespace) = http.send({
+	"url": sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v?labelSelector=%v", [
+		resource_group_mapping[resource],
+		namespace,
+		resource,
+		selector,
+	]),
+	"method": "get",
+	"headers": {"authorization": sprintf("Bearer %v", [opa.runtime().env.KUBERNETES_API_TOKEN])},
+	"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+	"raise_error": false,
+})
+
 # Query for all resources of type resource in all namespaces
+# Example: query_all("deployments")
 query_all(resource) = http.send({
 	"url": sprintf("https://kubernetes.default.svc/%v/%v", [
 		resource_group_mapping[resource],
@@ -42,8 +63,3 @@ query_all(resource) = http.send({
 	"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
 	"raise_error": false,
 })
-
-q := query_all("pods")
-
-#query_label_selector()
-#?labelSelector=environment%3Dproduction,tier%3Dfrontend
