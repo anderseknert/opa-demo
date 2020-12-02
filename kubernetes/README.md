@@ -1,4 +1,4 @@
-# opa-kubernetes-client
+# opa-kubernetes-api-client
 
 
 
@@ -9,13 +9,20 @@ Run the `setup.sh` script to create a local kubernetes cluster using [kind](http
 `POST http://localhost:8181/v1/query`
 ```json
 {
-    "query": "x := data.kubernetes.api_client.query_name_ns(\"deployments\",\"opa-kubernetes-client\", \"default\").body"
+    "query": "x := data.kubernetes.api.client.query_name_ns(\"deployments\",\"opa-kubernetes-client\", \"default\").body"
 }
 ```
 
 `POST http://localhost:8181/v1/query`
 ```json
 {
-    "query": "x := data.kubernetes.api_client.query_all(\"deployments\").body"
+    "query": "x := data.kubernetes.api.client.query_all(\"deployments\").body"
+}
+```
+
+`POST http://localhost:8181/v1/query`
+```json
+{
+    "query": "x := data.kubernetes.api.client.query_all(\"deployments\").body"
 }
 ```

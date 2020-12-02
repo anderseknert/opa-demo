@@ -1,4 +1,4 @@
-package kubernetes.api_client
+package kubernetes.api.client
 
 # This information could be retrieved from the kubernetes API
 # too, but would essentially require a request per API group,
@@ -35,15 +35,15 @@ query_name_ns(resource, name, namespace) = http.send({
 	"raise_error": false,
 })
 
-# Query for given resource type using label selector query string syntax
+# Query for given resource type using label selectors
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api
-# Example: query_label_selector_ns("deployments", "app%3Dopa-kubernetes-client", "default")
+# Example: query_label_selector_ns("deployments", {"app": "opa-kubernetes-client"}, "default")
 query_label_selector_ns(resource, selector, namespace) = http.send({
 	"url": sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v?labelSelector=%v", [
 		resource_group_mapping[resource],
 		namespace,
 		resource,
-		selector,
+		label_map_to_query_string(selector),
 	]),
 	"method": "get",
 	"headers": {"authorization": sprintf("Bearer %v", [opa.runtime().env.KUBERNETES_API_TOKEN])},
@@ -63,3 +63,5 @@ query_all(resource) = http.send({
 	"tls_ca_cert_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
 	"raise_error": false,
 })
+
+label_map_to_query_string(map) = concat(",", [str | val := map[key]; str := concat("%3D", [key, val])])
