@@ -31,7 +31,7 @@ deny[reason] {
 
 Many policies interacting with Kubernetes depends on knowing the current state of the cluster. Examples of this include checking for hostname or paths already in use by ingress resources, the number of workloads running on a node, or the total amount of memory allocated to an application. Having this data available for decisions significantly increases the number of possible use cases for policy enforcement, whether it be for authorization or admission control.
 
-Systems that integrate OPA and Kubernetes commonly provide a [cached](https://github.com/open-policy-agent/kube-mgmt#caching) or [replicated](https://github.com/open-policy-agent/gatekeeper#replicating-data) view of the Kubernetes API in order to enable these type of policies. The eventually consistent views of the cluster are tolerable for most use cases, but not for all. This library provides helper functions to communicate directly with the kubernetes API from inside of Rego, allowing for a snapshot view of any resources required to query for.
+Systems that integrate OPA and Kubernetes commonly provide a [cached](https://github.com/open-policy-agent/kube-mgmt#caching) or [replicated](https://github.com/open-policy-agent/gatekeeper#replicating-data) view of the Kubernetes API in order to enable these type of policies. The eventually consistent views of the cluster are tolerable for most use cases, but not for all. This library provides helper functions to communicate directly with the kubernetes API from inside of Rego, allowing for a snapshot view of any resources deployed to the cluster.
 
 ## Setup
 
