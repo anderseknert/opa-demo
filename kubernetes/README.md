@@ -53,7 +53,7 @@ metadata:
 type: kubernetes.io/service-account-token
 ```
 
-This will have the token controller automatically create a token for us and assign it to the `opa-kubernetes-api-client` service account. We'll now need to make the token visible to our policies - for this we'll patch our OPA container definitions to expose our token environment variable.
+This will have the token controller automatically create a token for us and assign it to the `opa-kubernetes-api-client` service account. We'll now need to make the token visible to our policies - for this we'll patch our OPA container definitions to expose our token as an environment variable.
 
 ```yaml
 apiVersion: apps/v1
@@ -111,6 +111,23 @@ roleRef:
 ```
 
 All done! You should now be able to call the functions included in this library to query the kubernetes API for resources directly.
+
+## Available functions
+
+```rego
+# Query for given resource/name in provided namespace
+# Example: query_ns("deployments", "my-app", "default")
+query_name_ns(resource, name, namespace)
+
+# Query for given resource type using label selectors
+# https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api
+# Example: query_label_selector_ns("deployments", {"app": "opa-kubernetes-api-client"}, "default")
+query_label_selector_ns(resource, selector, namespace)
+
+# Query for all resources of type resource in all namespaces
+# Example: query_all("deployments")
+query_all(resource)
+```
 
 ## Local development and testing
 
