@@ -4,17 +4,17 @@ metadata:
   name: default-read
 subjects:
 - kind: ServiceAccount
-  name: opa-kubernetes-client
+  name: opa-kubernetes-api-client
   namespace: default
 roleRef:
   kind: ClusterRole
-  name: opa-kubernetes-client
+  name: opa-kubernetes-api-client
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: opa-kubernetes-client
+  name: opa-kubernetes-api-client
 rules:
 - apiGroups:
   - ""

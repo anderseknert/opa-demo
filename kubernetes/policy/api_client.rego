@@ -37,7 +37,7 @@ query_name_ns(resource, name, namespace) = http.send({
 
 # Query for given resource type using label selectors
 # https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#api
-# Example: query_label_selector_ns("deployments", {"app": "opa-kubernetes-client"}, "default")
+# Example: query_label_selector_ns("deployments", {"app": "opa-kubernetes-api-client"}, "default")
 query_label_selector_ns(resource, selector, namespace) = http.send({
 	"url": sprintf("https://kubernetes.default.svc/%v/namespaces/%v/%v?labelSelector=%v", [
 		resource_group_mapping[resource],

@@ -6,6 +6,6 @@ resources:
 - resources/rbac.yaml
 - resources/service.yaml
 configMapGenerator:
-- name: opa-kubernetes-client
+- name: opa-kubernetes-api-client
   files:
   - policy/api_client.rego

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: opa-kubernetes-client
+  name: opa-kubernetes-api-client
   labels:
-    app: opa-kubernetes-client
+    app: opa-kubernetes-api-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: opa-kubernetes-client
+      app: opa-kubernetes-api-client
   template:
     metadata:
-      name: opa-kubernetes-client
+      name: opa-kubernetes-api-client
       labels:
-        app: opa-kubernetes-client
+        app: opa-kubernetes-api-client
     spec:
       containers:
       - name: opa
@@ -32,7 +32,7 @@ spec:
         - name: KUBERNETES_API_TOKEN
           valueFrom:
             secretKeyRef:
-              name: opa-kubernetes-client
+              name: opa-kubernetes-api-client
               key: token
         livenessProbe:
           httpGet:
@@ -54,4 +54,4 @@ spec:
       volumes:
       - name: policy
         configMap:
-          name: opa-kubernetes-client
+          name: opa-kubernetes-api-client
