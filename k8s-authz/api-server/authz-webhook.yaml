@@ -1,0 +1,15 @@
+clusters:
+- name: opa
+  cluster:
+    insecure-skip-tls-verify: true
+    server: https://10.96.167.0/v0/data/k8s/authz
+users:
+- name: api-server
+  user:
+    token: test-token
+current-context: webhook
+contexts:
+- context:
+    cluster: opa
+    user: api-sever
+  name: webhook
