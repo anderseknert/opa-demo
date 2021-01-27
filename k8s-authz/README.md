@@ -7,14 +7,12 @@
 Unlike admission controllers, authorization modules [can't be configured
 dynamically](https://github.com/kubernetes/kubernetes/issues/52511).
 This means that the configuration options for the authorizer
-webhook may only be provided as flags to the API server when starting them.
-This level of control is rarely provided in any of the cloud provider managed
-solutions, and to my knowledge none of the big ones (AWS, GCP, Azure) allow
-you to configure arbitrary flags for `kube-apiserver`. Using authorization
-webhooks is thus limited to self-managed kubernetes clusters.
-
-
-https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+webhook may only be provided as [flags](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/)
+to the API server when starting up. This level of control is rarely provided
+in any of the cloud provider managed solutions, and to my knowledge none of the
+big ones (AWS, GCP, Azure) allow you to configure arbitrary flags for
+`kube-apiserver`. Using authorization webhooks is thus limited to self-managed
+kubernetes clusters.
 
 ### DNS
 
