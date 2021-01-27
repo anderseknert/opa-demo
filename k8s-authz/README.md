@@ -4,20 +4,26 @@
 
 ### Configuration
 
-Unlike admission controllers, authorizer modules can't be configured
-dynamically. This means that the configuration options for the authorizer
+Unlike admission controllers, authorization modules [can't be configured
+dynamically](https://github.com/kubernetes/kubernetes/issues/52511).
+This means that the configuration options for the authorizer
 webhook may only be provided as flags to the API server when starting them.
 This level of control is rarely provided in any of the cloud provider managed
 solutions, and to my knowledge none of the big ones (AWS, GCP, Azure) allow
 you to configure arbitrary flags for `kube-apiserver`. Using authorization
 webhooks is thus limited to self-managed kubernetes clusters.
 
+
+https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+
 ### DNS
 
 Since the API server starts before most other components in the cluster -
-including DNS services like CoreDNS - it can't rely on them for resolving
-hostnames in the authorizer configuration. This means that pointing your
-authorizer webhook to an internal service URL like
+including DNS services like CoreDNS - it
+[can't](https://github.com/kubernetes/kubernetes/pull/68890)
+[rely](https://github.com/kubernetes/kubernetes/pull/71010) on them for
+resolving hostnames in the authorizer configuration. This means that pointing
+your authorizer webhook to an internal service URL like
 `https://opa-authorizer.opa-namespace.svc.cluster.local` won't work.
 
 Possible options include:
@@ -40,9 +46,8 @@ use a self-signed certificate issued for the known `clusterIP`, but is obviously
 not a good fit for production use cases. Consider one of the other options for
 those.
 
-https://github.com/kubernetes/kubernetes/issues/52511
-https://github.com/kubernetes/kubernetes/pull/68890
-https://github.com/kubernetes/kubernetes/pull/71010
-https://itnext.io/kubernetes-authorization-via-open-policy-agent-a9455d9d5ceb
-https://itnext.io/optimizing-open-policy-agent-based-kubernetes-authorization-via-go-execution-tracer-7b439bb5dc5b
-https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/
+## Further reading
+
+- [Kubernetes Authorization via Open Policy Agent](https://itnext.io/kubernetes-authorization-via-open-policy-agent-a9455d9d5ceb)
+- [Optimizing Open Policy Agent-based Kubernetes Authorization via Go Execution Tracer](https://itnext.io/optimizing-open-policy-agent-based-kubernetes-authorization-via-go-execution-tracer-7b439bb5dc5b)
+- [Kubernetes WebHook Authentication/Authorization with Minikube](https://medium.com/google-cloud/kubernetes-webhook-authentication-authorization-with-minikube-67b2b385ffd1)
