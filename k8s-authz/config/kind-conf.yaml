@@ -16,5 +16,6 @@ kubeadmConfigPatches:
       mountPath: /etc/kubernetes/api-server
     extraArgs:
       authorization-mode: Node,RBAC,Webhook
+      authorization-webhook-version: v1
       authorization-webhook-config-file: /etc/kubernetes/api-server/authz-webhook.yaml
       feature-gates: "EphemeralContainers=true"
