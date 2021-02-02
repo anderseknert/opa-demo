@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-pwd=$(pwd) envsubst < config/kind-conf.yaml | kind create cluster --config -
+k() {
+    kubectl --context kind-opa-authorizer "$@"
+}
 
-kubectl create namespace opa
-kubectl apply -k .
+pwd=$(pwd) envsubst < config/kind-conf.yaml | kind create cluster --name opa-authorizer --config -
+
+k create namespace opa
+k apply -k .

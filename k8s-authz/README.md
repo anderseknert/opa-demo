@@ -44,3 +44,19 @@ of the OPA pod (in the `opa` namespace) to see requests and responses.
 Change the policy under the policy directory and run `kubectl apply -k .` Note
 that it may take a while before the policy change is reflected in the running
 system.
+
+## Tests
+
+There's a couple of end-to-end tests using kubectl to test authorization policy
+enforcement in the `test.sh` script. Simply run it to have them executed:
+
+```shell
+$ ./test.sh
+All tests successful
+```
+
+## Cleanup
+
+```shell
+kind delete cluster --name opa-authorizer
+```
