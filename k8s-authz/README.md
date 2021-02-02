@@ -13,9 +13,10 @@ Just run:
 ```
 
 The demo uses [Kind](https://kind.sigs.k8s.io/) to launch a local Kubernetes
-cluster and then deploys OPA to that, with policies deployed from the
-[policy](policy) directory. Kind uses kubeadm so that's the config format used
-for providing flags to the API server (see [kind-conf.yaml](#kind-conf.yaml).
+cluster and then deploys OPA to that, with Kubernets authorization policies
+deployed from the [policy](policy) directory. Kind uses kubeadm so that's the
+config format used for providing the authorization webhook flags to the API
+server (see [kind-conf.yaml](#kind-conf.yaml).
 
 With the cluster up and running, you may now issue the usual `kubectl` commands
 to interact with your local Kubernetes API. Since the default user for kind is a
