@@ -3,16 +3,18 @@ package k8s.authz
 deny[reason] {
 	input.spec.resourceAttributes.namespace == "kube-system"
 
-	reason := "Denied access to namespace kube-system"
+	reason := "OPA: denied access to namespace kube-system"
 }
 
 deny[reason] {
+	input.spec.resourceAttributes.namespace == "opa"
+
 	required_groups := {"system:authenticated", "devops"}
 	provided_groups := {group | group := input.spec[groups][_]}
 
 	count(required_groups & provided_groups) != count(required_groups)
 
-	reason := sprintf("Provided groups (%v) does not include all required groups: (%v)", [
+	reason := sprintf("OPA: provided groups (%v) does not include all required groups: (%v)", [
 		concat(", ", provided_groups),
 		concat(", ", required_groups),
 	])

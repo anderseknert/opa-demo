@@ -1,6 +1,8 @@
-# Kubernetes authorizer webhook using OPA
+# Kubernetes authorization webhook using OPA
 
-Runnable Kubernetes authorization webhook example using OPA.
+Runnable Kubernetes
+[authorization webhook](https://kubernetes.io/docs/reference/access-authn-authz/webhook/)
+example using OPA for authorization policy decisions.
 
 ## Running
 
@@ -11,21 +13,18 @@ Just run:
 ```
 
 The demo uses [Kind](https://kind.sigs.k8s.io/) to launch a local Kubernetes
-cluster and then deploys OPA to that, so you'll obviously need that installed.
-Kind uses kubeadm so that's the config format used for providing flags to the
-API server (see [kind-conf.yaml](#kind-conf.yaml).
+cluster and then deploys OPA to that, with policies deployed from the
+[policy](policy) directory. Kind uses kubeadm so that's the config format used
+for providing flags to the API server (see [kind-conf.yaml](#kind-conf.yaml).
 
-If you want to update the policy, edit `policy/policy.rego` and run:
-
-```shell
-kubectl apply -k .
-```
-
-You may now issue the usual `kubectl` commands to interact with your local
-cluster. Since the default user for kind is a cluster admin with all priveleges
-it won't autmoatically be evaluated by the authorizer webhook (as the RBAC
-module is configured in front of it). In order to simulate requests from other
-users, use the impersonation feature of kubectl:
+With the cluster up and running, you may now issue the usual `kubectl` commands
+to interact with your local Kubernetes API. Since the default user for kind is a
+cluster admin with all priveleges granted it won't autmoatically be evaluated by
+the authorizer webhook (as the RBAC module is configured in front of it). In
+order to work around this, you could either setup a service account - or perhaps
+easier; just simulate requests from other users by using the
+[impersonation](https://kubernetes.io/docs/reference/access-authn-authz/authentication/#user-impersonation)
+feature of kubectl:
 
 ```shell
 $ kubectl get pods \
