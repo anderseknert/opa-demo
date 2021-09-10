@@ -65,7 +65,7 @@ kubectl --namespace opa wait --for=condition=ready pod -l app=opa
 
 kubectl apply -f webhook-configuration.yaml
 
-rm ca.crt ca.key ca.srl server.conf server.crt server.csr server.key
+rm ca.crt ca.key ca.srl server.conf server.crt server.csr server.key webhook-configuration.yaml
 
 kubectl --namespace opa create configmap policy --from-file=policy.rego
 
