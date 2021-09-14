@@ -58,9 +58,9 @@ webhooks:
     admissionReviewVersions: ["v1"]
 EOF
 
-sleep 10
-
 echo "Waiting for OPA pod to be ready"
+
+sleep 30
 kubectl --namespace opa wait --for=condition=ready pod -l app=opa
 
 kubectl apply -f webhook-configuration.yaml

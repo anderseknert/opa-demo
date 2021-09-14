@@ -6,4 +6,3 @@ deny[msg] {
 
     msg := "Not allowed to create deployments in default namespace"
 }
-
